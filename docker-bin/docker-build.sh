@@ -29,18 +29,6 @@ fi
 tz=$(ls -l "/etc/localtime" | awk '{print $NF}' | sed -e 's#/usr/share/zoneinfo/##g')
 echo "TZ: ${TZ:-default} (effective ${tz})"
 
-# Cron - Merge all files in /etc/cron.d into /etc/crontab
-if [ -d "/etc/cron.d" ]; then
-	# Remove the user name and merge into one file
-    echo "Merging cron in '/etc/cron.d' into '/etc/crontab'"
-	sed -r 's/(\s+)?\S+//6' /etc/cron.d/* > /etc/crontab
-fi
-
-if [ -f "/etc/crontab" ]; then
-    echo "Set mode g=rw on '/etc/crontab'"
-    chmod 664 /etc/crontab
-fi
-
 # Apache - Fix upstream link error
 if [ -d /var/www/html ]; then
     rm -rf /var/www/html

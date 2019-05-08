@@ -28,10 +28,6 @@ WAIT_FOR_IT_LIST=mysql:3306,smtp:25
 
 This command is ran from docker file. Apache is running on port `8080`.
 
-### Run cron daemon
-
-If the `cron` command is provided.
-
 ## Image Configuration at buildtime
 
 With docker build arguments (`docker build --build-arg VAR_NAME=VALUE`), if you want to change some of them you will need to run the command as root in your Dockerfile inheriting from the image in the script `/docker-bin/docker-build.sh`.
@@ -49,13 +45,7 @@ Log format by default is `combined` on container stdout, and apache is listening
 
 * **remoteip**: By default remoteip configuration is enabled, see runtime part of the documentation to configure it.
 * **serve-cgi-bin**: Is disabled by default.
-* **syslog**: You can enable Apache HTTPD logging to syslog, using `a2enconf syslog` in your docker build.
-
-### Cron configuration (buildtime)
-
-We're using [supercronic](https://github.com/aptible/supercronic) as cron dameon. You can put your cronfile in:
-*  `/etc/cron.d/` in the normal cron format '`minute` `hour` `day of month` `month` `day of week` `user` (NB: user will not be taken into consideration if our cron is not run as root) will be merged by `docker-build.sh` script at build time.
-* or create the file `/etc/crontab` in [supercronic supported format](https://github.com/gorhill/cronexpr).
+* **syslog**: You can enable Apache HTTPD logging to syslog, using `a2enconf syslog` in your docker build. See docker-compose.yml file for the configuration.
 
 ## Image Configuration at runtime
 
@@ -110,9 +100,5 @@ The Vhost configuration should have the following parameter :
     </Directory>
 </VirtualHost>
 ```
-
-### Cron configuration (runtime)
-
-* **CRON_DEBUG**: Enable debug mode of [supercronic](https://github.com/aptible/supercronic).
 
 #### This version is not included any php version. If you need an apache with php supported , please see the image linkbn/php-openshift

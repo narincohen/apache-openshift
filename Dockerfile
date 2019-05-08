@@ -6,7 +6,7 @@ ARG CA_HOSTS_LIST
 # System - Update embded package
 RUN apt-get -y update \
     && apt-get -y upgrade \
-    && apt-get install -y netcat curl
+    && apt-get install -y netcat curl libapache2-mod-auth-openidc
 
 # System - Set default timezone
 ENV TZ ${TZ}
@@ -17,7 +17,7 @@ RUN curl --connect-timeout 3 -fsS https://letsencrypt.org/certs/fakelerootx1.pem
 
 # Apache
 RUN apt-get install -y --no-install-recommends curl apache2 ca-certificates
-RUN a2enmod authnz_ldap rewrite remoteip
+RUN a2enmod auth_openidc rewrite remoteip
 
 # Apache - configuration
 COPY apache2/conf-available/ /etc/apache2/conf-available/

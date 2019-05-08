@@ -21,15 +21,6 @@ echo "USER_NAME: $(id)"
 
 echo "TZ: ${TZ}"
 
-# Loop on WAIT_FOR_IT_LIST
-if [ -n "${WAIT_FOR_IT_LIST}" ]; then
-	for hostport in $(echo "${WAIT_FOR_IT_LIST}" | sed -e 's/,/ /g'); do
-		${basedir}/wait-for-it.sh -s -t 0 ${hostport}
-	done
-else
-	echo "No WAIT_FOR_IT_LIST"
-fi
-
 # Apache - User
 export APACHE_RUN_USER="${USER_NAME}"
 echo "APACHE_RUN_USER: ${APACHE_RUN_USER}"
