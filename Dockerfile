@@ -1,9 +1,10 @@
+FROM debian:stretch
 ARG DEBIAN_VERSION=stretch
 ARG APACHE_OPENIDC_VERSION=2.3.11
-FROM debian:${DEBIAN_VERSION}
 ARG USER_ID=2000
 ARG TZ=UTC
 ARG CA_HOSTS_LIST
+RUN env
 # System - Update embded package
 RUN apt-get -y update \
     && apt-get -y upgrade \
