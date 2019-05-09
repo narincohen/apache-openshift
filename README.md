@@ -1,6 +1,6 @@
 # Apache docker image
 
-This Docker image be used for apache multi vhost for openshift. This inherits is based on the stretch Debian OS version, with changes made to the configuration to ensure compatibility with the [OpenShift security policy](https://docs.openshift.com/container-platform/3.11/creating_images/guidelines.html). 
+This Docker image be used for apache multi vhost for openshift. This inherits is based on the Debian OS version, with changes made to the configuration to ensure compatibility with the [OpenShift security policy](https://docs.openshift.com/container-platform/3.11/creating_images/guidelines.html). 
 
 If you want to make modifications to the image, your `Dockerfile` should look something like this, ensuring the PHP version is updated in the FROM image descriptor:
 
@@ -9,19 +9,9 @@ FROM linkbn/apache-openshift:X.X
 ARG USER_ID=2000
 USER root
 COPY vhost-conf-src/ /etc/apache2/conf-enabled
-COPY vhost-doc-src/ /var/apache2/docroots/
+COPY vhost-doc-src/ /var/www/html/
 RUN /docker-bin/docker-build.sh
 USER ${USER_ID}
-```
-
-## Entry-point specificity
-
-The entry-point script provides a wait for the service availability to be listed. Before running your command or service, you may be need to wait for supporting services to be up and listening (for example, waiting for you database server to be up and running on port 3306). You can provide the environment variable `WAIT_FOR_IT_LIST` with the list of service to test before starting up the application.
-
-If you want to wait for a MySQL server on port 3306 and an SMTP server on port 25, just provide:
-
-```
-WAIT_FOR_IT_LIST=mysql:3306,smtp:25
 ```
 
 ### Run Apache HTTPD
@@ -35,7 +25,6 @@ With docker build arguments (`docker build --build-arg VAR_NAME=VALUE`), if you 
 ### System configuration (buildtime)
 
 * **USER_ID**: Id of the user that will run the container (default: `2000`)
-* **USER_HOME**: Home directory of the user defined by `USER_ID` (default: `/home/user`)
 * **TZ**: System timezone will be used for cron and logs (default: `UTC`, done by `docker-build.sh`)
 * **CA_HOSTS_LIST**: List of host CA certificate to add to system CA list, example: `my-server1.local.net:443 my-server2.local.local:8443` (default: `none`, done by `docker-build.sh`)
 
@@ -80,7 +69,7 @@ Provide the command bellow to your dockerfile:
 
 ```
 COPY vhost-conf-src/ /etc/apache2/conf-enabled
-COPY vhost-doc-src/ /var/apache2/docroots/
+COPY vhost-doc-src/ /var/www/html/
 ```
 
 Which:
@@ -94,8 +83,8 @@ The Vhost configuration should have the following parameter :
 <VirtualHost *:8080>
     ServerName test.com
     ServerAlias test-dev.fr
-    DocumentRoot "/var/apache2/docroots/test.com/www"
-    <Directory /var/apache2/docroots/test.com/www>
+    DocumentRoot "/var/www/html/test.com/www"
+    <Directory /var/www/html/test.com/www>
 		Require all granted
     </Directory>
 </VirtualHost>
