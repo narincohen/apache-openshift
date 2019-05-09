@@ -29,12 +29,6 @@ fi
 tz=$(ls -l "/etc/localtime" | awk '{print $NF}' | sed -e 's#/usr/share/zoneinfo/##g')
 echo "TZ: ${TZ:-default} (effective ${tz})"
 
-# Apache - Fix upstream link error
-if [ -d /var/www/html ]; then
-    rm -rf /var/www/html
-    ln -s ${APP_DIR}/web/ /var/www/html
-fi
-
 # Apache - fix cache directory
 if [ -d /var/cache/apache2 ]; then
     chgrp -R 0 /var/cache/apache2

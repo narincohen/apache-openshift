@@ -18,7 +18,6 @@ if ! whoami &> /dev/null; then
 fi
 
 echo "USER_NAME: $(id)"
-
 echo "TZ: ${TZ}"
 
 # Apache - User
