@@ -36,6 +36,12 @@ Log format by default is `combined` on container stdout, and apache is listening
 * **serve-cgi-bin**: Is disabled by default.
 * **syslog**: You can enable Apache HTTPD logging to syslog, using `a2enconf syslog` in your docker build. See docker-compose.yml file for the configuration.
 
+The [**mod_auth_openidc**](https://github.com/zmartzone/mod_auth_openidc) module is present in the image, it's no enabled by default you can add it by, adding into your `Dockerfile` :
+
+```
+a2enmod auth_openidc
+```
+
 ## Image Configuration at runtime
 
 With environment variables (`docker run  -e VAR_NAME=VALUE`).
