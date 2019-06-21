@@ -18,6 +18,8 @@ RUN apt-get install -y --no-install-recommends libapache2-mod-auth-openidc
 RUN curl -sSL https://github.com/zmartzone/mod_auth_openidc/releases/download/v${APACHE_OPENIDC_VERSION}/libapache2-mod-auth-openidc_${APACHE_OPENIDC_VERSION}-1.${DEBIAN_VERSION}+1_amd64.deb > libapache2-mod-auth-openidc.deb \
     && dpkg -i libapache2-mod-auth-openidc.deb \
     && rm -f libapache2-mod-auth-openidc.deb
+# Apache - disable Etag
+RUN a2enconf etag
 # Apache - Disable useless configuration
 RUN a2disconf serve-cgi-bin
 # Apache - remoteip module
