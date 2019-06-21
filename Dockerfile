@@ -19,7 +19,7 @@ RUN curl -sSL https://github.com/zmartzone/mod_auth_openidc/releases/download/v$
     && dpkg -i libapache2-mod-auth-openidc.deb \
     && rm -f libapache2-mod-auth-openidc.deb
 # Apache - disable Etag
-RUN RUN a2enmod etag
+RUN a2enconf etag
 # Apache - Disable useless configuration
 RUN a2disconf serve-cgi-bin
 # Apache - remoteip module
