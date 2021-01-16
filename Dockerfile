@@ -1,20 +1,26 @@
-FROM debian:buster@sha256:b1feef0e231d159a8d9d9524ac507f2488e34d032421368830efb08ad5038f16
+FROM debian:buster@sha256:a5edb9fa5b2a8d6665ed911466827734795ef10d2b3985a46b7e9c7f0161a6b3
 ARG DEBIAN_VERSION=buster
-ARG APACHE_OPENIDC_VERSION=2.4.2.1
+ARG APACHE_OPENIDC_VERSION=2.4.5
 ARG USER_ID=2000
 ARG TZ=UTC
 ARG CA_HOSTS_LIST
 RUN env
 # System - Update embded package
+# hadolint ignore=DL3008
 RUN apt-get -y update \
-    && apt-get -y upgrade \
-    && apt-get install -y --no-install-recommends ca-certificates netcat curl apache2
+    && apt-get install -y --no-install-recommends ca-certificates netcat curl apache2 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 # System - Set default timezone
 ENV TZ ${TZ}
 # Apache - configuration
 COPY apache2/conf-available/ /etc/apache2/conf-available/
 # Apache - mod-auth-openidc (https://github.com/zmartzone/mod_auth_openidc/)
-RUN apt-get install -y --no-install-recommends libapache2-mod-auth-openidc
+# hadolint ignore=DL3008
+RUN apt-get -y update \
+    && apt-get install -y --no-install-recommends libapache2-mod-auth-openidc \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 RUN curl -sSL https://github.com/zmartzone/mod_auth_openidc/releases/download/v${APACHE_OPENIDC_VERSION}/libapache2-mod-auth-openidc_${APACHE_OPENIDC_VERSION}-1.${DEBIAN_VERSION}+1_amd64.deb > libapache2-mod-auth-openidc.deb \
     && dpkg -i libapache2-mod-auth-openidc.deb \
     && rm -f libapache2-mod-auth-openidc.deb
