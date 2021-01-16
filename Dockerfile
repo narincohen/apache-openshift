@@ -1,5 +1,5 @@
-FROM debian:buster@sha256:a5edb9fa5b2a8d6665ed911466827734795ef10d2b3985a46b7e9c7f0161a6b3
-ARG DEBIAN_VERSION=buster
+FROM debian:bullseye@sha256:3b19d4bb1d801f238bffedb4432021542217a25cf428b2cebe2ca49350e3c13d
+ARG DEBIAN_VERSION=bullseye
 ARG APACHE_OPENIDC_VERSION=2.4.5
 ARG USER_ID=2000
 ARG TZ=UTC
@@ -21,9 +21,9 @@ RUN apt-get -y update \
     && apt-get install -y --no-install-recommends libapache2-mod-auth-openidc \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-RUN curl -sSL https://github.com/zmartzone/mod_auth_openidc/releases/download/v${APACHE_OPENIDC_VERSION}/libapache2-mod-auth-openidc_${APACHE_OPENIDC_VERSION}-1.${DEBIAN_VERSION}+1_amd64.deb > libapache2-mod-auth-openidc.deb \
+RUN [ "${DEBIAN_VERSION}" = "bullseye" ] || (curl -sSL https://github.com/zmartzone/mod_auth_openidc/releases/download/v${APACHE_OPENIDC_VERSION}/libapache2-mod-auth-openidc_${APACHE_OPENIDC_VERSION}-1.${DEBIAN_VERSION}+1_amd64.deb > libapache2-mod-auth-openidc.deb \
     && dpkg -i libapache2-mod-auth-openidc.deb \
-    && rm -f libapache2-mod-auth-openidc.deb
+    && rm -f libapache2-mod-auth-openidc.deb)
 # Apache - disable Etag
 RUN a2enconf etag
 # Apache - Disable useless configuration
