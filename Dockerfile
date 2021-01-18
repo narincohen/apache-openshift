@@ -13,6 +13,8 @@ RUN apt-get -y update \
     && rm -rf /var/lib/apt/lists/*
 # System - Set default timezone
 ENV TZ ${TZ}
+# Apache - Disable not necessary module
+RUN a2dismod -f access_compat auth_basic authn_file autoindex authn_file authz_user env filter mime reqtimeout setenvif
 # Apache - configuration
 COPY apache2/conf-available/ /etc/apache2/conf-available/
 # Apache - mod-auth-openidc (https://github.com/zmartzone/mod_auth_openidc/)
@@ -24,6 +26,7 @@ RUN apt-get -y update \
 RUN [ "${DEBIAN_VERSION}" = "bullseye" ] || (curl -sSL https://github.com/zmartzone/mod_auth_openidc/releases/download/v${APACHE_OPENIDC_VERSION}/libapache2-mod-auth-openidc_${APACHE_OPENIDC_VERSION}-1.${DEBIAN_VERSION}+1_amd64.deb > libapache2-mod-auth-openidc.deb \
     && dpkg -i libapache2-mod-auth-openidc.deb \
     && rm -f libapache2-mod-auth-openidc.deb)
+RUN a2dismod auth_openidc
 # Apache - disable Etag
 RUN a2enconf etag
 # Apache - Disable useless configuration
@@ -47,8 +50,8 @@ ENV APACHE_SYSLOG_PORT 514
 ENV APACHE_SYSLOG_PROGNAME httpd
 # Apache- Prepare to be run as non root user
 RUN mkdir -p /var/lock/apache2 /var/run/apache2 \
-    && chgrp -R 0 /run /var/run/apache2 /var/lock/apache2 /var/log/apache2 \
-    && chmod -R g=u /etc/passwd /run /var/run/apache2 /var/lock/apache2 /var/log/apache2
+    && chgrp -R 0 /etc/apache2/mods-enabled /run /var/run/apache2 /var/lock/apache2 /var/log/apache2 \
+    && chmod -R g=u /etc/passwd /etc/apache2/mods-enabled /run /var/run/apache2 /var/lock/apache2 /var/log/apache2
 RUN rm -f /var/log/apache2/*.log \
     && ln -s /proc/self/fd/2 /var/log/apache2/error.log \
     && ln -s /proc/self/fd/1 /var/log/apache2/access.log
@@ -56,6 +59,10 @@ RUN sed -i -e 's/80/8080/g' -e 's/443/8443/g' /etc/apache2/ports.conf
 EXPOSE 8080 8443
 # System - Clean apt
 RUN apt-get autoremove -y
+# Apache - Disaply enable module
+RUN a2query -v \
+    && a2query -M \
+    && a2query -m
 COPY docker-bin/ /docker-bin/
 RUN chmod a+rx /docker-bin/*.sh \
     && /docker-bin/docker-build.sh
