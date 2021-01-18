@@ -15,8 +15,6 @@ RUN apt-get -y update \
 ENV TZ ${TZ}
 # Apache - Disable not necessary module
 RUN a2dismod -f access_compat auth_basic authn_file autoindex authn_file authz_user env filter mime reqtimeout setenvif
-# Apache - configuration
-COPY apache2/conf-available/ /etc/apache2/conf-available/
 # Apache - mod-auth-openidc (https://github.com/zmartzone/mod_auth_openidc/)
 # hadolint ignore=DL3008
 RUN apt-get -y update \
@@ -27,6 +25,7 @@ RUN [ "${DEBIAN_VERSION}" = "bullseye" ] || (curl -sSL https://github.com/zmartz
     && dpkg -i libapache2-mod-auth-openidc.deb \
     && rm -f libapache2-mod-auth-openidc.deb)
 RUN a2dismod auth_openidc
+COPY image-files/ /
 # Apache - disable Etag
 RUN a2enconf etag
 # Apache - Disable useless configuration
@@ -48,22 +47,31 @@ RUN sed -i -e 's/vhost_combined/combined/g' -e 's/other_vhosts_access/access/g' 
 # Apache - Syslog Log
 ENV APACHE_SYSLOG_PORT 514
 ENV APACHE_SYSLOG_PROGNAME httpd
-# Apache- Prepare to be run as non root user
-RUN mkdir -p /var/lock/apache2 /var/run/apache2 \
-    && chgrp -R 0 /etc/apache2/mods-enabled /run /var/run/apache2 /var/lock/apache2 /var/log/apache2 \
-    && chmod -R g=u /etc/passwd /etc/apache2/mods-enabled /run /var/run/apache2 /var/lock/apache2 /var/log/apache2
 RUN rm -f /var/log/apache2/*.log \
     && ln -s /proc/self/fd/2 /var/log/apache2/error.log \
     && ln -s /proc/self/fd/1 /var/log/apache2/access.log
-RUN sed -i -e 's/80/8080/g' -e 's/443/8443/g' /etc/apache2/ports.conf
 EXPOSE 8080 8443
-# System - Clean apt
-RUN apt-get autoremove -y
-# Apache - Disaply enable module
+RUN sed -i -e 's/80/8080/g' -e 's/443/8443/g' /etc/apache2/ports.conf
+# Apache- Prepare to be run as non root user
+RUN mkdir -p /var/lock/apache2 /var/run/apache2 \
+    && chgrp -R 0 /etc/apache2/mods-* \
+        /etc/apache2/sites-* \
+        /run /var/lib/apache2 \
+        /var/run/apache2 \
+        /var/lock/apache2 \
+        /var/log/apache2 \
+    && chmod -R g=u /etc/passwd \
+        /etc/apache2/mods-* \
+        /etc/apache2/sites-* \
+        /run \
+        /var/lib/apache2 \
+        /var/run/apache2 \
+        /var/lock/apache2 \
+        /var/log/apache2
+# Apache - Display information (version, module)
 RUN a2query -v \
     && a2query -M \
     && a2query -m
-COPY docker-bin/ /docker-bin/
 RUN chmod a+rx /docker-bin/*.sh \
     && /docker-bin/docker-build.sh
 USER ${USER_ID}
