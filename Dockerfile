@@ -13,7 +13,7 @@ RUN apt-get -y update \
 # System - Set default timezone
 ENV TZ ${TZ}
 # Apache - Disable not necessary module
-RUN a2dismod -f access_compat auth_basic authn_file autoindex authn_file authz_user env filter mime reqtimeout setenvif
+RUN a2dismod -f access_compat auth_basic authn_file autoindex authn_file authz_user env filter reqtimeout setenvif
 # Apache - mod-auth-openidc (https://github.com/zmartzone/mod_auth_openidc/)
 # hadolint ignore=DL3008
 RUN apt-get -y update \
