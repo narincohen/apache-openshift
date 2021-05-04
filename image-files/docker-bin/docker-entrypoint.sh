@@ -43,4 +43,14 @@ echo "APACHE_REMOTE_IP_HEADER: ${APACHE_REMOTE_IP_HEADER}"
 echo "APACHE_REMOTE_IP_TRUSTED_PROXY: ${APACHE_REMOTE_IP_TRUSTED_PROXY}"
 echo "APACHE_REMOTE_IP_INTERNAL_PROXY: ${APACHE_REMOTE_IP_INTERNAL_PROXY}"
 
+if [ -n "${APACHE_SITE_ENABLE}" ]; then
+	a2dissite '*'
+	for site in ${APACHE_SITE_ENABLE}; do
+		if [ "${site}" = "000-php.conf" ]; then
+			a2enmod headers proxy_fcgi rewrite
+		fi
+		a2ensite ${site}
+	done
+fi
+
 exec $@
