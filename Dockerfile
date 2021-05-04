@@ -20,11 +20,13 @@ RUN apt-get -y update \
     && apt-get install -y --no-install-recommends libapache2-mod-auth-openidc \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+# hadolint ignore=DL3059
 RUN if [ "${DEBIAN_VERSION}" != "bullseye" ]; then \
         curl -sSL "https://github.com/zmartzone/mod_auth_openidc/releases/download/v${APACHE_OPENIDC_VERSION}/libapache2-mod-auth-openidc_${APACHE_OPENIDC_VERSION}-1.${DEBIAN_VERSION}+1_amd64.deb" > libapache2-mod-auth-openidc.deb \
             && dpkg -i libapache2-mod-auth-openidc.deb \
             && rm -f libapache2-mod-auth-openidc.deb; \
     fi
+# hadolint ignore=DL3059
 RUN a2dismod auth_openidc
 COPY image-files/ /
 # Apache - disable Etag
@@ -33,13 +35,16 @@ RUN a2enconf etag
 RUN a2disconf serve-cgi-bin
 # Apache - remoteip module
 RUN a2enmod remoteip
+# hadolint ignore=DL3059
 RUN sed -i 's/%h/%a/g' /etc/apache2/apache2.conf
 ENV APACHE_REMOTE_IP_HEADER X-Forwarded-For
 ENV APACHE_REMOTE_IP_TRUSTED_PROXY 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
 ENV APACHE_REMOTE_IP_INTERNAL_PROXY 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
 RUN a2enconf remoteip
 # Apache - Hide version
-RUN sed -i 's/^ServerTokens OS$/ServerTokens Prod/g' /etc/apache2/conf-available/security.conf
+RUN sed -i -e 's/^ServerTokens OS$/ServerTokens Prod/g' \
+        -e 's/^ServerSignature On$/ServerSignature Off/g' \
+        /etc/apache2/conf-available/security.conf
 # Apache - Avoid warning at startup
 ENV APACHE_SERVER_NAME __default__
 RUN a2enconf servername
@@ -73,6 +78,7 @@ RUN mkdir -p /var/lock/apache2 /var/run/apache2 \
 RUN a2query -v \
     && a2query -M \
     && a2query -m
+# hadolint ignore=DL3059
 RUN chmod a+rx /docker-bin/*.sh \
     && /docker-bin/docker-build.sh
 USER ${USER_ID}
