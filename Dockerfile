@@ -1,4 +1,4 @@
-FROM debian:bullseye@sha256:9658b05d2e60411681aac306ebceb897d4994854cb2d250187e6251156c995a1
+FROM debian:bullseye@sha256:96331e160489f1125f121604a4999557e94c2e85a6925f98099ce47f727441fc
 ARG DEBIAN_VERSION=bullseye
 ARG APACHE_OPENIDC_VERSION=2.4.8.4
 ARG USER_ID=2000
@@ -11,7 +11,7 @@ RUN apt-get -y update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 # System - Set default timezone
-ENV TZ ${TZ}
+ENV TZ=${TZ}
 # Apache - Disable not necessary module
 # hadolint ignore=DL3008,DL3059
 RUN a2dismod -f access_compat auth_basic authn_file autoindex authn_file authz_user env filter reqtimeout setenvif \
@@ -34,22 +34,22 @@ RUN a2enconf etag \
     # Apache - remoteip module
     && a2enmod remoteip \
     && sed -i 's/%h/%a/g' /etc/apache2/apache2.conf
-ENV APACHE_REMOTE_IP_HEADER X-Forwarded-For
-ENV APACHE_REMOTE_IP_TRUSTED_PROXY 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
-ENV APACHE_REMOTE_IP_INTERNAL_PROXY 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+ENV APACHE_REMOTE_IP_HEADER=X-Forwarded-For
+ENV APACHE_REMOTE_IP_TRUSTED_PROXY="10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
+ENV APACHE_REMOTE_IP_INTERNAL_PROXY="10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
 RUN a2enconf remoteip
 # Apache - Hide version
 RUN sed -i -e 's/^ServerTokens OS$/ServerTokens Prod/g' \
         -e 's/^ServerSignature On$/ServerSignature Off/g' \
         /etc/apache2/conf-available/security.conf
 # Apache - Avoid warning at startup
-ENV APACHE_SERVER_NAME __default__
+ENV APACHE_SERVER_NAME=__default__
 RUN a2enconf servername \
     # Apache - Logging
     && sed -i -e 's/vhost_combined/combined/g' -e 's/other_vhosts_access/access/g' /etc/apache2/conf-available/other-vhosts-access-log.conf
 # Apache - Syslog Log
-ENV APACHE_SYSLOG_PORT 514
-ENV APACHE_SYSLOG_PROGNAME httpd
+ENV APACHE_SYSLOG_PORT=514
+ENV APACHE_SYSLOG_PROGNAME=httpd
 RUN rm -f /var/log/apache2/*.log \
     && ln -s /proc/self/fd/2 /var/log/apache2/error.log \
     && ln -s /proc/self/fd/1 /var/log/apache2/access.log
