@@ -48,8 +48,8 @@ RUN a2enconf servername \
     # Apache - Logging
     && sed -i -e 's/vhost_combined/combined/g' -e 's/other_vhosts_access/access/g' /etc/apache2/conf-available/other-vhosts-access-log.conf
 # Apache - enable X-Content-Type-Options
-RUN sed -i -e '/X-Content-Type-Options/s/^#//g' \
-        /etc/apache2/conf-available/security.conf
+RUN a2enmod headers \
+    && sed -i -e '/X-Content-Type-Options/s/^#//g' /etc/apache2/conf-available/security.conf
 # Apache - Syslog Log
 ENV APACHE_SYSLOG_PORT=514
 ENV APACHE_SYSLOG_PROGNAME=httpd
