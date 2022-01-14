@@ -1,6 +1,6 @@
 FROM debian:bullseye@sha256:96331e160489f1125f121604a4999557e94c2e85a6925f98099ce47f727441fc
 ARG DEBIAN_VERSION=bullseye
-ARG APACHE_OPENIDC_VERSION=2.4.8.4
+ARG APACHE_OPENIDC_VERSION=2.4.10
 ARG USER_ID=2000
 ARG TZ=UTC
 ARG CA_HOSTS_LIST
@@ -20,11 +20,9 @@ RUN a2dismod -f access_compat auth_basic authn_file autoindex authn_file authz_u
     && apt-get install -y --no-install-recommends libapache2-mod-auth-openidc \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && if [ "${DEBIAN_VERSION}" != "bullseye" ]; then \
-        curl -sSL "https://github.com/zmartzone/mod_auth_openidc/releases/download/v${APACHE_OPENIDC_VERSION}/libapache2-mod-auth-openidc_${APACHE_OPENIDC_VERSION}-1.${DEBIAN_VERSION}+1_amd64.deb" > libapache2-mod-auth-openidc.deb \
-            && dpkg -i libapache2-mod-auth-openidc.deb \
-            && rm -f libapache2-mod-auth-openidc.deb; \
-    fi \
+    && curl -sSL "https://github.com/zmartzone/mod_auth_openidc/releases/download/v${APACHE_OPENIDC_VERSION}/libapache2-mod-auth-openidc_${APACHE_OPENIDC_VERSION}-1.${DEBIAN_VERSION}+1_amd64.deb" > libapache2-mod-auth-openidc.deb \
+    && dpkg -i libapache2-mod-auth-openidc.deb \
+    && rm -f libapache2-mod-auth-openidc.deb \
     && a2dismod auth_openidc
 COPY image-files/ /
 # Apache - disable Etag
