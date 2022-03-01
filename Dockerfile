@@ -1,4 +1,4 @@
-FROM debian:bullseye@sha256:fb45fd4e25abe55a656ca69a7bef70e62099b8bb42a279a5e0ea4ae1ab410e0d
+FROM debian:bullseye@sha256:10b622c6cf6daa0a295be74c0e412ed20e10f91ae4c6f3ce6ff0c9c04f77cbf6
 ARG DEBIAN_VERSION=bullseye
 ARG APACHE_OPENIDC_VERSION=2.4.10
 ARG USER_ID=2000
